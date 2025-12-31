@@ -51,91 +51,95 @@ def process_image(img_pil):
     prediction = model.predict(img_array, verbose=0)[0]
     return prediction[0]  # Cancer probability
 
-# === NEW: Load Sample Images from Your GitHub Repo ===
-st.markdown("### 📊 Test with Built-in Sample Mammograms")
+# === Load Sample Images from Your GitHub Repo ===
+st.markdown("### 📊 Test with Built-in Sample Mammograms (Mini-MIAS Dataset)")
 
-# CHANGE THIS to your actual GitHub repo raw URL base
-# Example: if your repo is https://github.com/yourusername/breast-cancer-app
-# and images are in folder /samples/
-GITHUB_RAW_BASE = "https://raw.githubusercontent.com/yourusername/your-repo-name/main/samples/"  
+# UPDATE THIS LINE with your actual GitHub repo details
+# Example: if repo is https://github.com/simon57/breast-cancer-ai and images in /samples folder
+GITHUB_RAW_BASE = "https://raw.githubusercontent.com/YOURUSERNAME/YOUR-REPO-NAME/main/samples/"
 
-# Update these with your actual image filenames (case-sensitive!)
+# Your exact sample images
 sample_images = {
-    "Normal Mammogram (Expected: Low Risk)": "normal1.png",
-    "Benign Calcification (Expected: Low Risk)": "benign1.png",
-    "Malignant Mass (Expected: High Risk)": "malignant1.png",
-    "Suspicious Finding (Expected: High Risk)": "malignant2.png",
-    # Add more as you upload
+    "mdb215.png": "mdb215.png",
+    "mdb216.png": "mdb216.png",
+    "mdb217.png": "mdb217.png",
+    "mdb218.png": "mdb218.png",
+    "mdb219.png": "mdb219.png",
+    "mdb220.png": "mdb220.png",
+    "mdb221.png": "mdb221.png",
+    "mdb222.png": "mdb222.png",
+    "mdb223.png": "mdb223.png",
+    "mdb224.png": "mdb224.png"
 }
 
-selected_sample_name = st.selectbox("Select a sample image to analyze", options=[""] + list(sample_images.keys()))
+# Dropdown selection
+selected_filename = st.selectbox("Select a sample mammogram to analyze", options=[""] + list(sample_images.keys()))
 
 selected_image = None
-if selected_sample_name:
-    filename = sample_images[selected_sample_name]
-    image_url = GITHUB_RAW_BASE + filename
+if selected_filename:
+    image_url = GITHUB_RAW_BASE + selected_filename
     
     try:
         response = requests.get(image_url)
         response.raise_for_status()
         selected_image = Image.open(BytesIO(response.content))
-        st.image(selected_image, caption=selected_sample_name, use_column_width=True)
-    except:
-        st.error(f"Could not load image: {filename}. Check filename and GitHub path.")
+        st.image(selected_image, caption=f"Sample: {selected_filename}", use_column_width=True)
+    except Exception as e:
+        st.error(f"Error loading image: {selected_filename}. Check GitHub path and filename. Details: {str(e)}")
 
 # === Upload Your Own ===
 st.markdown("### 📤 Or Upload Your Own Mammogram")
 uploaded_file = st.file_uploader("Upload digital mammogram (JPG/PNG/JPEG)", type=["jpg", "png", "jpeg"])
 
-# === Analysis Section ===
+# === Analysis ===
 if uploaded_file or selected_image:
     if uploaded_file:
         image = Image.open(uploaded_file)
-        source = "Uploaded Image"
+        source = "Your Uploaded Image"
     else:
         image = selected_image
-        source = "Sample Image"
+        source = "Selected Sample Image"
 
-    col1, col2 = st.columns([1, 1])
+    col1, col2 = st.columns(2)
     
     with col1:
-        st.image(image, caption=f"{source}", use_column_width=True)
+        st.image(image, caption=source, use_column_width=True)
     
     with col2:
         st.markdown("### 🔍 AI Analysis Result")
-        with st.spinner("Processing image with AI..."):
+        with st.spinner("AI processing image..."):
             prob = process_image(image)
         
         if prob >= 0.5:
             st.error(f"**High Risk Detected** • Malignancy Probability: {prob:.1%}")
-            st.write("**Recommendation**: Urgent clinical evaluation required")
+            st.write("**Recommendation**: Immediate clinical follow-up advised")
         else:
             st.success(f"**Low Risk** • Malignancy Probability: {prob:.1%}")
             st.write("**Recommendation**: Continue routine screening")
 
-# === Awareness & Prevention ===
+# === Awareness Section ===
 st.markdown("## 🎗️ Breast Cancer Awareness & Prevention")
-st.markdown("### Risk Factors & Prevention Strategies")
-
 col_inf1, col_inf2 = st.columns(2)
 with col_inf1:
-    st.image("https://www.iarc.who.int/wp-content/uploads/2023/10/BCAM_2_zoom.jpg", caption="Global Statistics (WHO/IARC)", use_column_width=True)
+    st.image("https://www.iarc.who.int/wp-content/uploads/2023/10/BCAM_2_zoom.jpg", caption="Global Breast Cancer Statistics (WHO/IARC)", use_column_width=True)
 
 with col_inf2:
     st.image("https://www.shutterstock.com/image-vector/breast-cancer-awareness-infographic-empowering-600nw-2355615993.jpg", caption="Early Detection & Empowerment", use_column_width=True)
 
-st.markdown("### Key Recommendations")
+st.markdown("### Key Prevention Tips")
 st.write("""
-- Annual mammograms starting age 40–50
-- Monthly breast self-exams
-- Healthy lifestyle: exercise, balanced diet, limited alcohol
-- Genetic counseling if family history present
+- Start annual mammograms at age 40–50
+- Perform monthly breast self-exams
+- Maintain healthy weight and regular exercise
+- Limit alcohol consumption
+- Breastfeed if possible
+- Know your family history
 """)
 
-# === Footer with Contact ===
+# === Footer with Your Contact ===
 st.markdown("""
 <div class='footer'>
     <strong>System by Simon</strong> • Contact: <a href="mailto:allinmer57@gmail.com">allinmer57@gmail.com</a><br>
-    © 2025 Breast Cancer AI Screening Assistant • Educational Tool • Built with ❤️ for global health awareness
+    © 2025 Breast Cancer AI Screening Assistant • Educational & Research Tool • Built for Global Health Awareness
 </div>
 """, unsafe_allow_html=True)
