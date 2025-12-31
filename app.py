@@ -3,7 +3,7 @@ import os
 os.environ["KERAS_BACKEND"] = "tensorflow"
 
 from huggingface_hub import hf_hub_download
-import tensorflow as tf
+import keras
 import numpy as np
 from PIL import Image
 import requests
@@ -24,37 +24,33 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 st.markdown("<h1 class='main-header'>🎗️ Breast Cancer AI Screening Assistant</h1>", unsafe_allow_html=True)
-st.markdown("<p class='sub-header'>Improved AI model • Better detection of normal mammograms • Educational tool</p>", unsafe_allow_html=True)
+st.markdown("<p class='sub-header'>Preliminary AI analysis • Trained on CBIS-DDSM • Educational tool only</p>", unsafe_allow_html=True)
 
 st.markdown("""
 <div class='disclaimer'>
 <strong>⚠️ Important Medical Disclaimer</strong><br><br>
-This tool provides preliminary AI analysis for educational purposes only. 
-It is <strong>not a substitute for professional diagnosis</strong>. 
-All results require confirmation by qualified radiologists.
+This AI provides educational analysis only. Model may overestimate risk on dense normal breasts due to training limitations.<br>
+<strong>NOT a substitute for professional diagnosis</strong>. Always consult qualified radiologists.
 </div>
 """, unsafe_allow_html=True)
 
-# Load improved model (ResNet50 fine-tuned on CBIS-DDSM – better generalization)
 @st.cache_resource
 def load_model():
-    with st.spinner("Loading improved AI model..."):
-        # Using a better public ResNet50 model trained on mammography
-        model_path = hf_hub_download(repo_id="keremberke/breast-cancer-classification", filename="resnet50.h5")
-        model = tf.keras.models.load_model(model_path)
-        return model
+    with st.spinner("Loading AI model..."):
+        model_path = hf_hub_download(repo_id="maiurilorenzo/CBIS-DDSM-CNN", filename="CNN_model.h5")
+        return keras.saving.load_model(model_path)
 
 model = load_model()
-st.success("✅ Improved AI Model Loaded (ResNet50 – Better Accuracy)")
+st.success("✅ AI Model Loaded")
 
 def process_image(img_pil):
-    img = img_pil.convert("RGB").resize((224, 224))  # ResNet50 input size
+    img = img_pil.convert("RGB").resize((50, 50))
     img_array = np.array(img).astype(np.float32) / 255.0
     img_array = np.expand_dims(img_array, axis=0)
     prediction = model.predict(img_array)[0]
-    return prediction[1]  # Probability of malignant (class 1)
+    return prediction[0]  # Cancer probability
 
-# Sample Images from Your GitHub
+# Your Sample Images
 st.markdown("### 📊 Test with Your Sample Mammograms (Mini-MIAS)")
 GITHUB_RAW_BASE = "https://raw.githubusercontent.com/wiseman-s/test2/main/sample%20images/"
 
@@ -74,7 +70,7 @@ sample_labels = {
     "mdb224.png": "mdb224 – Normal"
 }
 
-selected_filename = st.selectbox("Select sample", options=[""] + sample_images, format_func=lambda x: sample_labels.get(x, x) if x else "— Choose sample —")
+selected_filename = st.selectbox("Select sample", options=[""] + sample_images, format_func=lambda x: sample_labels.get(x, x))
 
 selected_image = None
 if selected_filename:
@@ -84,11 +80,11 @@ if selected_filename:
         selected_image = Image.open(BytesIO(response.content))
         st.image(selected_image, caption=sample_labels[selected_filename], use_column_width=True)
     except:
-        st.error("Failed to load image – check filename/repo")
+        st.error("Image load failed")
 
 # Upload
-st.markdown("### 📤 Or Upload Your Own Mammogram")
-uploaded_file = st.file_uploader("Upload (JPG/PNG/JPEG)", type=["jpg", "png", "jpeg"])
+st.markdown("### 📤 Or Upload Your Own")
+uploaded_file = st.file_uploader("Upload mammogram", type=["jpg", "png", "jpeg"])
 
 if uploaded_file or selected_image:
     image = Image.open(uploaded_file) if uploaded_file else selected_image
@@ -104,24 +100,25 @@ if uploaded_file or selected_image:
             prob = process_image(image)
         
         st.markdown("<div class='analysis-box'>", unsafe_allow_html=True)
-        st.markdown(f"**Malignancy Probability: {prob:.1%}**")
+        st.markdown(f"**Raw Malignancy Probability: {prob:.1%}**")
         
-        if prob >= 0.7:
+        # Adjusted thresholds to reduce false positives
+        if prob >= 0.8:
             st.error("**HIGH RISK**")
-            st.markdown("Suspicious features detected – clinical review recommended")
-        elif prob >= 0.4:
+            st.markdown("Strong suspicious features – urgent clinical review recommended")
+        elif prob >= 0.5:
             st.warning("**MODERATE RISK**")
-            st.markdown("Some concerning patterns – follow-up imaging advised")
+            st.markdown("Some patterns detected – may be dense tissue or early changes. Clinical correlation needed")
         else:
             st.success("**LOW RISK**")
-            st.markdown("No highly suspicious features – routine screening sufficient")
+            st.markdown("No highly suspicious features – consistent with normal/benign findings")
         
         st.markdown("</div>", unsafe_allow_html=True)
 
 # Prevention
 st.markdown("## 🎗️ Prevention & Awareness")
-st.image("https://www.iarc.who.int/wp-content/uploads/2023/10/BCAM_2_zoom.jpg", caption="Global Statistics 2025")
-st.write("Start screening at age 40 • Healthy lifestyle • Know your risk")
+st.image("https://www.iarc.who.int/wp-content/uploads/2023/10/BCAM_2_zoom.jpg", caption="Global Statistics")
+st.write("- Annual screening from age 40\n- Healthy lifestyle\n- Know your risk")
 
 # Footer
 st.markdown("""
