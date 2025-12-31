@@ -51,29 +51,33 @@ def process_image(img_pil):
     prediction = model.predict(img_array, verbose=0)[0]
     return prediction[0]  # Cancer probability
 
-# === Load Sample Images from Your GitHub Repo ===
+# === Load Your Sample Images from GitHub ===
 st.markdown("### 📊 Test with Built-in Sample Mammograms (Mini-MIAS Dataset)")
 
-# UPDATE THIS LINE with your actual GitHub repo details
-# Example: if repo is https://github.com/simon57/breast-cancer-ai and images in /samples folder
-GITHUB_RAW_BASE = "https://raw.githubusercontent.com/YOURUSERNAME/YOUR-REPO-NAME/main/samples/"
+# Your exact GitHub raw base URL (with %20 for space in folder name)
+GITHUB_RAW_BASE = "https://raw.githubusercontent.com/wiseman-s/test2/main/sample%20images/"
 
-# Your exact sample images
-sample_images = {
-    "mdb215.png": "mdb215.png",
-    "mdb216.png": "mdb216.png",
-    "mdb217.png": "mdb217.png",
-    "mdb218.png": "mdb218.png",
-    "mdb219.png": "mdb219.png",
-    "mdb220.png": "mdb220.png",
-    "mdb221.png": "mdb221.png",
-    "mdb222.png": "mdb222.png",
-    "mdb223.png": "mdb223.png",
-    "mdb224.png": "mdb224.png"
+# Your exact images (mdb215 to mdb224)
+sample_images = [
+    "mdb215.png", "mdb216.png", "mdb217.png", "mdb218.png", "mdb219.png",
+    "mdb220.png", "mdb221.png", "mdb222.png", "mdb223.png", "mdb224.png"
+]
+
+# Dropdown with nice labels (including known pathology from Mini-MIAS database)
+sample_labels = {
+    "mdb215.png": "mdb215.png (Dense breast, Normal - Expected: Low Risk)",
+    "mdb216.png": "mdb216.png (Dense breast, Malignant Calcification - Expected: High Risk)",
+    "mdb217.png": "mdb217.png (Glandular breast, Normal - Expected: Low Risk)",
+    "mdb218.png": "mdb218.png (Glandular breast, Benign Calcification - Expected: Low Risk)",
+    "mdb219.png": "mdb219.png (Glandular breast, Benign Calcification - Expected: Low Risk)",
+    "mdb220.png": "mdb220.png (Glandular breast, Normal - Expected: Low Risk)",
+    "mdb221.png": "mdb221.png (Dense breast, Normal - Expected: Low Risk)",
+    "mdb222.png": "mdb222.png (Dense breast, Benign Calcification - Expected: Low Risk)",
+    "mdb223.png": "mdb223.png (Dense breast, Benign Calcification - Expected: Low Risk)",
+    "mdb224.png": "mdb224.png (Dense breast, Normal - Expected: Low Risk)"
 }
 
-# Dropdown selection
-selected_filename = st.selectbox("Select a sample mammogram to analyze", options=[""] + list(sample_images.keys()))
+selected_filename = st.selectbox("Select a sample mammogram to analyze", options=[""] + sample_images, format_func=lambda x: sample_labels.get(x, x) if x else "Choose a sample...")
 
 selected_image = None
 if selected_filename:
@@ -83,9 +87,9 @@ if selected_filename:
         response = requests.get(image_url)
         response.raise_for_status()
         selected_image = Image.open(BytesIO(response.content))
-        st.image(selected_image, caption=f"Sample: {selected_filename}", use_column_width=True)
+        st.image(selected_image, caption=f"Sample: {sample_labels[selected_filename]}", use_column_width=True)
     except Exception as e:
-        st.error(f"Error loading image: {selected_filename}. Check GitHub path and filename. Details: {str(e)}")
+        st.error(f"Error loading {selected_filename}. Check if file exists in repo. Error: {str(e)}")
 
 # === Upload Your Own ===
 st.markdown("### 📤 Or Upload Your Own Mammogram")
@@ -95,10 +99,10 @@ uploaded_file = st.file_uploader("Upload digital mammogram (JPG/PNG/JPEG)", type
 if uploaded_file or selected_image:
     if uploaded_file:
         image = Image.open(uploaded_file)
-        source = "Your Uploaded Image"
+        source = "Your Uploaded Mammogram"
     else:
         image = selected_image
-        source = "Selected Sample Image"
+        source = "Selected Sample"
 
     col1, col2 = st.columns(2)
     
@@ -136,7 +140,7 @@ st.write("""
 - Know your family history
 """)
 
-# === Footer with Your Contact ===
+# === Footer with Contact ===
 st.markdown("""
 <div class='footer'>
     <strong>System by Simon</strong> • Contact: <a href="mailto:allinmer57@gmail.com">allinmer57@gmail.com</a><br>
