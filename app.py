@@ -11,36 +11,35 @@ from io import BytesIO
 
 st.set_page_config(page_title="Breast Cancer AI Screening Tool", page_icon="🎗️", layout="centered")
 
-# Professional styling
 st.markdown("""
 <style>
     .stApp {background: linear-gradient(to bottom, #fff5f8, #ffffff);}
     .main-header {font-size: 2.7rem; color: #C2185B; text-align: center; font-weight: bold;}
     .sub-header {font-size: 1.3rem; color: #666; text-align: center; margin-bottom: 40px;}
     .disclaimer {background-color: #ffebee; padding: 20px; border-radius: 12px; border-left: 5px solid #E91E63; margin: 30px 0;}
+    .note {background-color: #e8f5e8; padding: 15px; border-radius: 10px; margin: 20px 0; border-left: 5px solid #4CAF50;}
     .analysis-box {background-color: #f9f9f9; padding: 20px; border-radius: 10px; border: 1px solid #e0e0e0;}
-    .note {background-color: #e8f5e8; padding: 15px; border-radius: 10px; margin: 20px 0;}
     .footer {text-align: center; margin-top: 60px; color: #888; font-size: 0.95rem; padding: 20px;}
 </style>
 """, unsafe_allow_html=True)
 
 st.markdown("<h1 class='main-header'>🎗️ Breast Cancer AI Screening Assistant</h1>", unsafe_allow_html=True)
-st.markdown("<p class='sub-header'>Preliminary AI analysis • Trained on CBIS-DDSM • Educational tool</p>", unsafe_allow_html=True)
+st.markdown("<p class='sub-header'>Educational AI analysis • Trained on CBIS-DDSM • Demonstrates real-world AI challenges</p>", unsafe_allow_html=True)
 
 st.markdown("""
 <div class='disclaimer'>
-<strong>⚠️ Important Medical Disclaimer</strong><br><br>
-This AI tool is for <strong>educational and research purposes only</strong>.<br>
-The current model may <strong>overestimate risk on normal dense breasts</strong> due to training data limitations (focus on abnormalities).<br>
-<strong>NOT a substitute for professional radiological diagnosis</strong>. Always consult qualified doctors.
+<strong>⚠️ Critical Medical Disclaimer</strong><br><br>
+This tool is <strong>strictly educational and research-oriented</strong>.<br>
+The model often overestimates risk on normal dense breasts due to training on abnormality-focused data.<br>
+<strong>NOT for clinical use or diagnosis</strong>. Results require verification by qualified radiologists.
 </div>
 """, unsafe_allow_html=True)
 
 st.markdown("""
 <div class='note'>
-<strong>📝 Model Note</strong><br>
-This basic CNN model is highly sensitive to breast density. Normal dense mammograms may receive higher probabilities. 
-Clinical correlation with patient history and additional views is essential.
+<strong>📊 Model Behavior Note</strong><br>
+Normal or dense mammograms may receive elevated probabilities due to natural tissue patterns resembling abnormalities in training data.<br>
+This demonstrates a common AI challenge: false positives in screening tools. Clinical context (patient history, additional views) is essential.
 </div>
 """, unsafe_allow_html=True)
 
@@ -60,14 +59,18 @@ def process_image(img_pil):
     prediction = model.predict(img_array)[0]
     return prediction[0]
 
-# Your Samples
+# Samples
 st.markdown("### 📊 Test with Your Sample Mammograms (Mini-MIAS)")
 GITHUB_RAW_BASE = "https://raw.githubusercontent.com/wiseman-s/test2/main/sample%20images/"
 
 sample_images = ["mdb215.png", "mdb216.png", "mdb217.png", "mdb218.png", "mdb219.png",
                  "mdb220.png", "mdb221.png", "mdb222.png", "mdb223.png", "mdb224.png"]
 
-sample_labels = { ... }  # Same as before
+sample_labels = {
+    "mdb215.png": "mdb215 – Normal (Dense breast)",
+    "mdb216.png": "mdb216 – Malignant Calcification",
+    # ... (keep your labels)
+}
 
 selected_filename = st.selectbox("Select sample", options=[""] + sample_images, format_func=lambda x: sample_labels.get(x, x))
 
@@ -101,24 +104,25 @@ if uploaded_file or selected_image:
         st.markdown("<div class='analysis-box'>", unsafe_allow_html=True)
         st.markdown(f"**Raw Malignancy Probability: {prob:.1%}**")
         
-        # Calibrated thresholds to reduce false positives on normal/dense
-        if prob >= 0.85:
+        if prob >= 0.9:
             st.error("**HIGH RISK ASSESSMENT**")
-            st.markdown("Strong suspicious features detected (e.g., clustered calcifications or irregular masses). Urgent clinical review recommended.")
-        elif prob >= 0.6:
-            st.warning("**MODERATE RISK ASSESSMENT**")
-            st.markdown("Some patterns detected – may represent early changes or dense tissue overlap. Further imaging (ultrasound/MRI) advised.")
+            st.markdown("Strong suspicious features detected – urgent clinical review recommended")
+        elif prob >= 0.7:
+            st.warning("**MODERATE TO HIGH RISK**")
+            st.markdown("Elevated probability – may indicate abnormality or dense tissue overlap. Further evaluation needed")
         else:
             st.success("**LOW RISK ASSESSMENT**")
-            st.markdown("No highly suspicious features identified – consistent with normal or benign findings. Continue routine screening.")
+            st.markdown("Lower probability – consistent with normal findings, though dense tissue can elevate scores")
         
         st.markdown("</div>", unsafe_allow_html=True)
 
-# Prevention & Footer same
+# Prevention & Footer
+st.markdown("## 🎗️ Prevention & Awareness")
+st.write("Start screening early • Healthy lifestyle • Know your family history")
 
 st.markdown("""
 <div class='footer'>
     <strong>System by Simon</strong> • Contact: <a href="mailto:allinmer57@gmail.com">allinmer57@gmail.com</a><br>
-    © 2025 Breast Cancer AI Tool • Educational Platform
+    © 2025 Breast Cancer AI Educational Tool
 </div>
 """, unsafe_allow_html=True)
