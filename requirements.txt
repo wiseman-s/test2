@@ -1,10 +1,6 @@
 streamlit
 tensorflow
-keras
-numpy
-pillow
 huggingface_hub
+pillow
+numpy
 requests
-pydicom
-reportlab
-opencv-python-headless
