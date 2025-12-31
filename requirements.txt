@@ -1,7 +1,6 @@
 streamlit
-keras
 tensorflow
 huggingface_hub
-opencv-python-headless
 pillow
 numpy
+requests
