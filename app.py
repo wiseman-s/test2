@@ -12,12 +12,30 @@ from io import BytesIO
 # === Page Config & Professional Theme ===
 st.set_page_config(page_title="Breast Cancer AI Screening Tool", page_icon="🎗️", layout="centered")
 
-# Professional background & styling (soft pink awareness theme)
+# Professional background & styling with full dark mode support
 st.markdown("""
 <style>
+    /* Light mode background (soft pink awareness theme) */
     .stApp {
         background: linear-gradient(to bottom, #fff5f8, #ffffff);
     }
+    
+    /* Dark mode overrides - clean and readable */
+    @media (prefers-color-scheme: dark) {
+        .stApp {
+            background: linear-gradient(to bottom, #1e1e1e, #121212) !important;
+        }
+        .main-header {color: #FF4081 !important;}
+        .sub-header {color: #bbbbbb !important;}
+        .disclaimer {background-color: #3a1a2a !important; border-left: 5px solid #FF4081 !important;}
+        .analysis-box {background-color: #2a2a2a !important; border: 1px solid #444 !important; color: #e0e0e0 !important;}
+        .footer {color: #aaaaaa !important;}
+        section[data-testid="stSidebar"] {background-color: #1e1e1e !important;}
+        .stMarkdown, p, div, span, li {color: #e0e0e0 !important;}
+        h1, h2, h3, h4 {color: #ffffff !important;}
+        a {color: #FF79B0 !important;}
+    }
+
     .main-header {font-size: 2.7rem; color: #C2185B; text-align: center; font-weight: bold; margin-bottom: 10px;}
     .sub-header {font-size: 1.3rem; color: #666; text-align: center; margin-bottom: 40px;}
     .disclaimer {background-color: #ffebee; padding: 20px; border-radius: 12px; border-left: 5px solid #E91E63; margin: 30px 0;}
