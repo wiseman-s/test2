@@ -78,6 +78,11 @@ st.markdown(
             padding: 20px;
         }
 
+        .footer a {
+            color: #C2185B;
+            text-decoration: none;
+        }
+
         /* Dark mode */
         @media (prefers-color-scheme: dark) {
 
@@ -110,6 +115,10 @@ st.markdown(
 
             .footer {
                 color: #aaaaaa !important;
+            }
+
+            .footer a {
+                color: #FF79B0 !important;
             }
 
             section[data-testid="stSidebar"] {
@@ -159,7 +168,7 @@ st.markdown(
     <p class="sub-header">
         AI-powered preliminary mammogram analysis •
         Trained on CBIS-DDSM dataset •
-        Educational & research tool
+        Educational &amp; research tool
     </p>
     """,
     unsafe_allow_html=True
@@ -212,7 +221,6 @@ def load_model():
         return model
 
 
-# Load model safely
 try:
 
     model = load_model()
@@ -267,7 +275,7 @@ def process_image(img_pil):
 
 
 # ============================================================
-# SAMPLE IMAGES
+# BUILT-IN SAMPLE MAMMOGRAMS
 # ============================================================
 
 st.markdown(
@@ -410,7 +418,7 @@ uploaded_file = st.file_uploader(
 
 
 # ============================================================
-# DETERMINE IMAGE TO ANALYZE
+# IMAGE ANALYSIS
 # ============================================================
 
 if uploaded_file or selected_image:
@@ -505,7 +513,7 @@ if uploaded_file or selected_image:
 
 
         # ====================================================
-        # HIGH OUTPUT
+        # HIGH MODEL OUTPUT
         # ====================================================
 
         if prob >= 0.7:
@@ -535,7 +543,7 @@ if uploaded_file or selected_image:
 
 
         # ====================================================
-        # INTERMEDIATE OUTPUT
+        # INTERMEDIATE MODEL OUTPUT
         # ====================================================
 
         elif prob >= 0.5:
@@ -564,7 +572,7 @@ if uploaded_file or selected_image:
 
 
         # ====================================================
-        # LOWER OUTPUT
+        # LOWER MODEL OUTPUT
         # ====================================================
 
         else:
@@ -692,15 +700,20 @@ st.markdown(
             System Developed by Simon
         </strong>
 
-        • Contact:
+        <br>
+
+        Contact:
         <a href="mailto:allinmer57@gmail.com">
             allinmer57@gmail.com
         </a>
 
-        <br>
+        <br><br>
 
         © 2026 Breast Cancer AI Screening Assistant
-        • Educational & Research Platform
+
+        <br>
+
+        Educational &amp; Research Platform
         • Global Health Awareness
 
     </div>
